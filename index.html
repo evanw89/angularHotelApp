@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="hotels">
+<head>
+	<title></title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+	<link rel="stylesheet" href="app/css/spinner.css">
+	<link rel="stylesheet" href="app/css/app.css">
+</head>
+<!-- "as" creates an alias for the preceding controller -->
+<body id="page-top" ng-controller="HotelsCtrl as hotels">
+
+	<!-- SPINNER -->
+	<div text-align="center">
+		<div class="spinner" ng-hide="loaded"></div>
+	</div>
+
+	<nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand page-scroll" href="#page-top">SLEEKER</a>
+			</div>
+		</div>
+	</nav>
+
+	<header>
+		<div class="header-content">
+			<div class="header-content-inner">
+				<h1>Check In</h1>
+				<hr>
+			</div>
+		</div>
+	</header>
+
+	<a internal-link id="transition" ng-href="#searchFormContainer">searchForm</a>
+
+	<div id="searchFormContainer" class="container-fluid">
+
+		<div class="row py-5">
+			<div class="col-12">
+				<div class="row px-5">
+					<!-- ng-submit is defined on the form itself, not the input-->
+					<!-- submission can onle occur when the form is not pristine and no errors are occuring -->
+					<form name="searchForm" ng-submit="!searchForm.$pristine && searchForm.$valid && hotels.searchAvailability()" class="form-inline" role="form" novalidate>
+
+						<div class="col-3">
+							<div class="form-group">
+				<!-- 				<span class="fa fa-road"></span>  -->
+								<label for="search">Search:</label>
+								<input ng-model="search.name" name="search" type="search" ng-minlength="2" class="form-control" required id="search" placeholder="Where">
+							</div>
+						</div>
+							
+
+						<div class="col-2">
+							<div class="form-group">
+								<label for="arrival">Check-In:</label>
+								<div class="input-group">
+									<input ng-model="search.arrivalDt" name="arrival" type="search" ng-minlength="2" class="form-control" required id="arrivalDt" placeholder="12/22/2017">
+									<span class="input-group-addon">
+										<span class="fa fa-calendar"></span>
+									</span>
+								</div>
+							</div>
+						</div>
+							
+
+						<div class="col-2">
+							<div class="form-group">
+								<label for="departure">Check-Out:</label>
+								<div class="input-group">
+									<input ng-model="search.departureDt" name="departure" type="search" ng-minlength="2" class="form-control" required id="departureDt" placeholder="12/24/2017">
+									<span class="input-group-addon">
+										<span class="fa fa-calendar"></span>
+									</span>
+								</div>
+							</div>
+						</div>
+							
+
+						<div class="col-3">
+							<div class="form-group">
+								<label for="room">Room:</label>
+								<select class="form-control" id="room">
+									<option>Studio</option>
+									<option selected="selected">1 Bed</option>
+									<option>2 Bed</option>
+									<option>Villa</option>
+									<option>Penthouse</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="col-2 h-100">
+							<button type="submit" class="btn btn-primary">Submit</button>
+							<!-- name of the form, name of the field (input name), error accessor -->
+
+							<!-- <br>
+							Pristine: {{searchForm.$pristine}} <br>
+							Dirty: {{searchForm.$dirty}} <br>
+							Valid: {{searchForm.$valid}} <br> -->
+						</div>
+
+					</form>
+				</div>
+				<div class="row">
+					<div ng-messages="searchForm.search.$error" style="color:maroon" role="alert" ng-if="searchForm.search.$dirty" ng-messages-multiple>
+						<div ng-message="minlength">Can you be more specific?</div>
+						<div ng-message="required">Please enter all information</div>
+					</div>
+
+					<div ng-messages="searchForm.arrival.$error" style="color:maroon" role="alert" ng-if="searchForm.arrival.$dirty" ng-messages-multiple>
+						<div ng-message="minlength">Can you be more specific?</div>
+						<div ng-message="required">Please enter all information</div>
+					</div>
+
+					<div ng-messages="searchForm.departure.$error" style="color:maroon" role="alert" ng-if="searchForm.departure.$dirty" ng-messages-multiple>
+						<div ng-message="minlength">Can you be more specific?</div>
+						<div ng-message="required">Please enter all information</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row py-4 results animated" 
+				ng-class="{fadeInUp: hotels.displayAnimation}"
+				ng-repeat="room in hotels.rooms"
+					>
+				<div class="col-8">
+					<div class="container-fluid">
+						
+						<div class="card">
+							<div class="card-header"><h3>Hotel <a href="#page-top" id="back" class="pull-right">BACK TO TOP</a></h3></div>
+							<div class="card-block">
+								<img class="hotelThumbnail" src="img/hotels.jpg">
+								<h6>Size: {{room.size}}</h6>
+								<h6>Beds: {{room.beds}}</h6>
+								<h6>Room #: {{room.roomNumber}}</h6>
+								<!-- ng-show only prints on true boolean logic -->
+								<h6 ng-show="room.kitchen">Kitchen Available</h6>
+								<!-- <h3>Price: ${{room.price}}</h3> -->
+								<div ng-switch on="hotels.isPromoted(room)">
+									<p ng-switch-when="promote" ng-class="{heavy:hotels.isPromoted(room)}" ng-hide="!room.promotion">Save {{room.promotion.discount}} {{room.promotion.message}}<br>
+									Price: {{room.promotion.promoPrice}}</p>
+
+									<p ng-switch-default >Price: ${{room.price}}</p>
+
+								</div>
+								<button class="btn-danger" ng-hide="room.isBooked" ng-click="hotels.booking(room)">Book Now!</button>
+							</div>
+						</div>
+					</div>
+
+
+
+						
+				</div>
+				<div class="col-4 text-right bg-grey p-4">
+					<h3>ADZ HERE</h3>
+					<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- OVERLAY -->
+	<div class="overlay"></div>
+
+</body>
+	<!--BOOTSTRAP 4-->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+	<!-- LOAD ANGULARJS LIBRARIES -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-route.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-messages.js"></script>
+	<!-- LOAD APPLICATION LIBRARIES -->
+	<script src="app/hotels/hotels.js"></script>
+</html>
